@@ -1,0 +1,56 @@
+export const meta = {
+  title: "Headless WordPress with Next.js",
+  description:
+    "Keep the editing experience your team knows while serving a fast, modern front end. A practical overview of the architecture.",
+  date: "2026-09-10",
+  category: "Learn",
+  tags: ["Next.js", "WordPress", "CMS"],
+};
+
+Many businesses already run WordPress, and their teams know how to use it. What they often want is a faster, more distinctive website — without retraining everyone on a new CMS.
+
+A headless setup separates the two concerns. WordPress stays as the place where content is written and managed. Next.js renders the website.
+
+## The shape of the architecture
+
+```text
+Editors → WordPress (content + media)
+                 │
+          REST or GraphQL API
+                 │
+       Next.js (rendering + routing) → Visitors
+```
+
+WordPress never serves pages to visitors directly. It becomes a content API.
+
+## Fetching content
+
+WordPress ships with a REST API. Fetching posts from a Next.js Server Component is a plain `fetch`:
+
+```ts title="lib/wordpress.ts"
+const WP_URL = process.env.WORDPRESS_URL;
+
+export async function getPosts() {
+  const res = await fetch(`${WP_URL}/wp-json/wp/v2/posts?_embed`, {
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) throw new Error(`WordPress returned ${res.status}`);
+  return res.json();
+}
+```
+
+Because this runs on the server, no WordPress credentials or API calls ever reach the browser, and pages can be rendered ahead of time and refreshed on a schedule.
+
+## Things to plan for
+
+**Previews.** Editors expect to preview drafts. That needs an authenticated preview route in Next.js, so plan it from the start.
+
+**Revalidation.** Time-based revalidation is simple. For instant updates, a WordPress hook can call a revalidation endpoint whenever a post is published.
+
+**Content modelling.** Free-form page builders do not translate well to a headless front end. Structured fields (custom post types and field groups) map much more cleanly to components.
+
+**Media.** Images still live in WordPress. Configure the image optimiser to allow that host so images are resized and served in modern formats.
+
+## When it's worth it
+
+Headless adds a second system to host and maintain. It is worth it when performance, design freedom or integration with other systems matters — and when the team's familiarity with WordPress is a real asset. For a small brochure site, a traditional theme may be the simpler answer.

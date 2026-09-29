@@ -1,0 +1,62 @@
+export const meta = {
+  title: "Laravel and Django, side by side",
+  description:
+    "Two mature, batteries-included frameworks with different philosophies. What each does well, and how I choose between them.",
+  date: "2026-09-19",
+  category: "Engineering",
+  tags: ["Laravel", "Django", "Backend"],
+};
+
+I work with both Laravel and Django, and I'm often asked which is better. The honest answer is that both are excellent, and the right choice usually depends on the project and the team rather than the framework.
+
+Here is how they compare in the areas that matter most to me.
+
+## Philosophy
+
+**Laravel** optimises for developer experience. Its APIs read like sentences, and the ecosystem — queues, scheduling, authentication scaffolding, first-party packages — makes common product features very quick to build.
+
+**Django** optimises for explicitness and stability. "Explicit is better than implicit" runs through the framework. It changes carefully, and code written years ago tends to keep working.
+
+## Data and the ORM
+
+Both ORMs are mature. Eloquent uses the active-record pattern, which feels natural for CRUD-heavy apps. Django's ORM uses querysets that compose nicely and make complex filtering readable.
+
+```python
+# Django: bookings for a staff member today, excluding cancellations
+Booking.objects.filter(
+    staff=staff,
+    start__date=today,
+).exclude(status__in=["cancelled", "saloncancelled"])
+```
+
+```php
+// Laravel: the same query with Eloquent
+Booking::where('staff_id', $staff->id)
+    ->whereDate('start', $today)
+    ->whereNotIn('status', ['cancelled', 'saloncancelled'])
+    ->get();
+```
+
+Both migration systems are solid. Django generates migrations from model changes; Laravel migrations are written by hand, which some teams prefer for control.
+
+## APIs
+
+For API-first products, Django REST Framework is a standout: serializers, viewsets, permissions and throttling form a coherent toolkit for building versioned, secure APIs.
+
+Laravel's API resources and Sanctum cover most needs well, and with Inertia it's possible to build SPA-like interfaces without a separate API at all.
+
+## The admin
+
+Django's built-in admin is a genuine advantage for internal tools. A usable back office comes almost for free from the models. Laravel has excellent admin packages too, but they are additions rather than part of the core.
+
+## Ecosystem and hiring
+
+Django sits in the Python ecosystem, which is useful when a project touches data processing or AI. Laravel sits in the PHP ecosystem, with very broad hosting support and a large community of developers.
+
+## How I choose
+
+- If the product is API-first, data-heavy or likely to involve Python tooling, I lean towards **Django**.
+- If the product is a full-stack web application where speed of delivery and a rich first-party ecosystem matter, I lean towards **Laravel**.
+- If the client's team already knows one of them, that usually settles it.
+
+The framework matters less than the structure inside it. Thin controllers, business rules in a service layer and a clear data model will serve a project well in either.

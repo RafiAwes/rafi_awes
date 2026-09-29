@@ -1,0 +1,58 @@
+export const meta = {
+  title: "Practical notes on building with LLM APIs",
+  description:
+    "Language models make impressive demos. Shipping features people can rely on takes a few unglamorous habits.",
+  date: "2026-09-12",
+  category: "AI",
+  tags: ["AI", "LLM", "Product"],
+};
+
+Adding a language model to a product is easy. A single API call can summarise a document or draft a reply. Making that feature reliable enough for people to depend on is where the real work is.
+
+These are the habits I think matter most.
+
+## Give the model one clear job
+
+"An AI assistant for your business" is not a feature. "Extract the customer name, date and service from this booking request" is. Narrow tasks are easier to prompt, easier to test and much easier to trust.
+
+## Ask for structure
+
+When the output feeds into software, ask for structured data and validate it like any other input.
+
+```ts
+type BookingRequest = {
+  customerName: string;
+  service: string;
+  preferredDate: string | null;
+};
+
+function isBookingRequest(value: unknown): value is BookingRequest {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.customerName === "string" &&
+    typeof v.service === "string" &&
+    (v.preferredDate === null || typeof v.preferredDate === "string")
+  );
+}
+```
+
+If validation fails, retry once or fall back to a human. Never pass unvalidated model output straight into a database.
+
+## Keep a human in the loop where it matters
+
+For drafts, summaries and suggestions, the model can do most of the work while a person approves the result. For anything with financial, legal or medical consequences, the model should assist a decision, not make it.
+
+## Build an evaluation set early
+
+Collect real examples — including awkward ones — with the output you expect. Run them whenever you change the prompt or the model. Without this, every change is a guess.
+
+## Watch cost and latency
+
+Model calls are slower and more expensive than normal API calls. Stream responses where people are waiting, cache where the same input repeats, and choose the smallest model that passes your evaluation set.
+
+## Be deliberate about data
+
+Decide explicitly what data may be sent to a model provider. Remove what isn't needed, and make sure the people whose data it is would be comfortable with how it's used.
+
+None of this is novel. It is the same discipline as any other integration — which is exactly the point.

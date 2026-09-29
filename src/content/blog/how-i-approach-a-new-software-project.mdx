@@ -1,0 +1,51 @@
+export const meta = {
+  title: "How I approach a new software project",
+  description:
+    "The questions I ask before writing any code, and why the first week of a project matters more than the first commit.",
+  date: "2026-09-26",
+  category: "Process",
+  tags: ["Process", "Product", "Freelancing"],
+};
+
+When someone brings me a project, the temptation is to start building immediately. There is usually a clear request — *we need a booking system*, *we need a new website* — and it would be easy to open an editor and begin.
+
+I've learned to resist that. The first week of a project decides far more than the first commit.
+
+## Understand the problem, not the request
+
+A request describes a solution someone has already imagined. Behind it is a problem, and the problem is what I actually need to understand.
+
+So I ask questions like:
+
+- What happens today, step by step, without the new system?
+- Where does it go wrong, and how often?
+- Who will use this every day, and what do they care about?
+- What would make this project obviously worth it six months from now?
+
+Sometimes the answers confirm the original request. Often they reshape it. Occasionally they reveal that the right answer is an existing tool rather than custom software — and saying so is part of the job.
+
+## Define the smallest version that matters
+
+Once the problem is clear, we agree on the smallest version that solves the most important part of it. Not a stripped-down demo, but a real, usable slice.
+
+I write this down as user flows and a short list of what is *in* and what is explicitly *out*. The "out" list is the most useful document in the project; it prevents a lot of friendly scope creep.
+
+## Design the system before the interface
+
+Before any screens, I sketch the data model and the key workflows. What are the core entities? What states can they be in? What must never happen?
+
+For a booking system that means thinking about conflicts, cancellations and approvals before thinking about the calendar view. The interface is much easier to design once the system underneath is clear.
+
+## Build in thin, complete slices
+
+I prefer to build one workflow end to end — database, API, interface, tests — rather than all the database tables, then all the APIs, then all the screens. A complete slice can be shown, tested and corrected early.
+
+## Keep a list of known gaps
+
+Every project has things that are not finished yet. I keep them written down, next to the features, so the state of the project is always honest — for the client, and for whoever works on it next.
+
+## Plan for after launch
+
+Launch is not the end. Before shipping, we agree how the system will be monitored, who handles updates, and what happens with the next round of improvements.
+
+None of this is complicated. It is just the difference between software that gets delivered and software that actually gets used.

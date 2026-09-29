@@ -1,0 +1,64 @@
+export const meta = {
+  title: "How I approached a salon booking system",
+  description:
+    "A booking is not a time slot. Notes on modelling approvals, cancellations and reliability in a salon operations platform.",
+  date: "2026-09-24",
+  category: "Build",
+  tags: ["Architecture", "Django", "Booking"],
+};
+
+The first version of every booking system looks the same: a calendar, a list of services and a button that says **Book**. It is also the version that breaks first, because in a real salon a booking is not a time slot. It is an agreement between a customer, a staff member and a business — and each of them can change their mind.
+
+This is how I approached that problem while building GlowHaat OS, a role-based salon operations platform with a Django REST Framework API and a React frontend.
+
+## Start with the lifecycle, not the screen
+
+Before designing any interface I wrote down every state a booking can be in and every transition between them:
+
+```text
+pending → confirmed → completed
+   │           │
+   │           └→ cancellation_pending → cancelled / usercancelled
+   └→ saloncancelled
+```
+
+Two decisions came out of that diagram immediately.
+
+First, a booking only becomes **confirmed** once both the manager and the assigned staff member accept it. Staff are not interchangeable: a booking assigned to someone on leave should never silently be confirmed.
+
+Second, a cancellation by the salon is a different event from a cancellation by the customer. If the salon cancels, it must never count against the customer.
+
+## Keep business rules out of the views
+
+Booking logic touches a lot: availability, conflicts, payments, notifications, loyalty points. If that logic lives in API views it spreads everywhere and becomes impossible to test.
+
+Instead, multi-step operations live in service classes and run inside a database transaction:
+
+```text
+Client → /api/v1/<module>/ → ViewSet → Serializer → Service → Models
+```
+
+The serializer validates shape. The service decides whether the operation is allowed and what else must happen. The view just connects the two.
+
+## Measure reliability kindly
+
+Late cancellations and no-shows cost a salon real money, so the system tracks them. But a single missed appointment should not define a new customer.
+
+Each customer has a reliability score built from four components — completion, show-up, cancellation and punctuality — blended by a confidence factor that discounts thin history. Salon-cancelled bookings are filtered out before anything is calculated. Only persistent patterns lead to booking suspension.
+
+<Callout title="Design principle">
+  When a system judges people, make the rules explicit, make them forgiving
+  by default, and never let the business's own mistakes count against a customer.
+</Callout>
+
+## Store what happened, not just what exists
+
+Prices change. Services get renamed. If a booking only references the current service, last year's invoice will show this year's price.
+
+Bookings and payments therefore store a **snapshot** of the service name and price at the moment of booking. It is a little redundant, and it keeps history true.
+
+## Write down what isn't finished
+
+The platform is still in development, and its documentation has a section called *Known gaps and caveats*: development token lifetimes, a hardcoded API URL, a demonstration payment model that must be replaced with a tokenising provider before real cards are involved.
+
+Listing those gaps next to the features is one of the most useful habits I have. It keeps the roadmap honest, and it means nobody mistakes unfinished work for finished work.

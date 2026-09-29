@@ -1,0 +1,40 @@
+export const meta = {
+  title: "Choosing the right architecture for a business application",
+  description:
+    "Most business applications don't need microservices. A well-structured monolith, clear boundaries and a few deliberate decisions go a long way.",
+  date: "2026-09-03",
+  category: "Think",
+  tags: ["Architecture", "Business Software"],
+};
+
+Architecture discussions often start with technology: which framework, which database, whether to use microservices. For most business applications, the more important questions are simpler.
+
+## Start with a modular monolith
+
+A single deployable application, organised into clear modules — bookings, customers, inventory, billing — is the right starting point for almost every business system.
+
+It is easier to develop, test, deploy and reason about. The key is discipline at the boundaries: modules talk to each other through defined interfaces, not by reaching into each other's tables.
+
+If one module later needs to scale independently, clean boundaries make it possible to extract it. Starting with services makes everything else harder from day one.
+
+## Put business rules in one place
+
+Views and controllers should be thin. Validation belongs at the edge; business rules belong in a service layer that can be tested without HTTP.
+
+This matters most for operations with side effects: confirming a booking might check conflicts, charge a deposit, send an email and award loyalty points. That should be one transactional operation, not four scattered calls.
+
+## Version the API from the beginning
+
+Mounting every route under `/api/v1/` costs nothing on day one. The day a breaking change is needed, a `v2` can sit beside it without forcing every client to move at once.
+
+## Be secure by default
+
+Require authentication globally and let public endpoints opt out explicitly. The reverse — remembering to protect each private endpoint — fails the first time someone forgets.
+
+## Choose boring data storage
+
+A relational database like PostgreSQL handles the vast majority of business workloads well, and its constraints protect data integrity in ways application code often doesn't. Add a cache like Redis when you have a measured need.
+
+## Decide what you will not build
+
+Good architecture is as much about what is left out. Every queue, service and integration is something to monitor and maintain. Add them when a real requirement appears, and write down why.

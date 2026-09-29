@@ -1,0 +1,677 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Design tokens
+   ========================================================================== */
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /* Neutrals */
+  --color-ink-950: #0b0b0d;
+  --color-ink-900: #151518;
+  --color-ink-800: #1d1d21;
+  --color-ink-700: #2a2a30;
+  --color-ink-500: #6b6b73;
+  --color-ink-400: #a1a1a8;
+  --color-paper-50: #f7f6f2;
+  --color-paper-100: #efeee9;
+  --color-paper-200: #e2e0d8;
+  --color-paper-300: #cfccc2;
+  --color-graphite: #111113;
+  --color-chalk: #f5f5f2;
+
+  /* Accent — used sparingly: highlights, active states, small glows */
+  --color-accent-blue: #5b7cff;
+  --color-accent-violet: #9b7bff;
+
+  /* Display type scale (fluid) */
+  --text-display-2xl: clamp(4rem, 17vw, 15rem);
+  --text-display-2xl--line-height: 0.82;
+  --text-display-2xl--letter-spacing: -0.06em;
+  --text-display-xl: clamp(2.75rem, 7.4vw, 7.25rem);
+  --text-display-xl--line-height: 0.94;
+  --text-display-xl--letter-spacing: -0.045em;
+  --text-display-lg: clamp(2.25rem, 5.2vw, 5rem);
+  --text-display-lg--line-height: 1;
+  --text-display-lg--letter-spacing: -0.04em;
+  --text-display-md: clamp(1.875rem, 3.6vw, 3.375rem);
+  --text-display-md--line-height: 1.05;
+  --text-display-md--letter-spacing: -0.035em;
+  --text-display-sm: clamp(1.5rem, 2.5vw, 2.25rem);
+  --text-display-sm--line-height: 1.12;
+  --text-display-sm--letter-spacing: -0.028em;
+  --text-lead: clamp(1.0625rem, 1.25vw, 1.25rem);
+  --text-lead--line-height: 1.6;
+  --text-eyebrow: 0.6875rem;
+  --text-eyebrow--line-height: 1.2;
+  --text-eyebrow--letter-spacing: 0.2em;
+
+  --radius-card: 1.25rem;
+  --radius-frame: 1.75rem;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+
+  --breakpoint-3xl: 112rem;
+}
+
+/* Semantic colours resolve against the current surface (see surface-* below),
+   so components render correctly on either a dark or a light section. */
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent-fg);
+}
+
+:root {
+  --duration-fast: 200ms;
+  --duration-base: 450ms;
+  --duration-slow: 900ms;
+  --reveal-distance: 28px;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --header-height: 4.5rem;
+  --accent-gradient: linear-gradient(
+    120deg,
+    var(--color-accent-blue),
+    var(--color-accent-violet)
+  );
+}
+
+/* ==========================================================================
+   Surfaces
+   ========================================================================== */
+
+@utility surface-dark {
+  --surface: var(--color-ink-950);
+  --surface-raised: var(--color-ink-900);
+  --fg: var(--color-chalk);
+  --fg-muted: #a3a3ab;
+  --fg-subtle: #7a7a83;
+  --line: rgb(245 245 242 / 0.1);
+  --line-strong: rgb(245 245 242 / 0.22);
+  --accent-fg: #93a5ff;
+  background-color: var(--surface);
+  color: var(--fg);
+  color-scheme: dark;
+}
+
+@utility surface-darker {
+  --surface: #070708;
+  --surface-raised: var(--color-ink-950);
+  --fg: var(--color-chalk);
+  --fg-muted: #a3a3ab;
+  --fg-subtle: #7a7a83;
+  --line: rgb(245 245 242 / 0.1);
+  --line-strong: rgb(245 245 242 / 0.22);
+  --accent-fg: #93a5ff;
+  background-color: var(--surface);
+  color: var(--fg);
+  color-scheme: dark;
+}
+
+@utility surface-light {
+  --surface: var(--color-paper-50);
+  --surface-raised: #ffffff;
+  --fg: var(--color-graphite);
+  --fg-muted: #55555d;
+  --fg-subtle: #74747c;
+  --line: rgb(17 17 19 / 0.1);
+  --line-strong: rgb(17 17 19 / 0.2);
+  --accent-fg: #3a55e0;
+  background-color: var(--surface);
+  color: var(--fg);
+  color-scheme: light;
+}
+
+@utility surface-light-alt {
+  --surface: var(--color-paper-100);
+  --surface-raised: var(--color-paper-50);
+  --fg: var(--color-graphite);
+  --fg-muted: #52525a;
+  --fg-subtle: #707078;
+  --line: rgb(17 17 19 / 0.11);
+  --line-strong: rgb(17 17 19 / 0.22);
+  --accent-fg: #3a55e0;
+  background-color: var(--surface);
+  color: var(--fg);
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+@utility container-site {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+@utility text-gradient {
+  background-image: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-eyebrow);
+  line-height: var(--text-eyebrow--line-height);
+  letter-spacing: var(--text-eyebrow--letter-spacing);
+  text-transform: uppercase;
+}
+
+/* Hairline grid used as a quiet structural backdrop. */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+@utility grain {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: calc(var(--header-height) + 1.5rem);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-accent-blue) 40%, transparent);
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-fg, var(--color-accent-blue));
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* ==========================================================================
+   Motion
+   Every motion rule is scoped to prefers-reduced-motion: no-preference.
+   Reveal states additionally require scripting so content is never hidden
+   when JavaScript is unavailable.
+   ========================================================================== */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rise-blur {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate3d(0, 0.35em, 0);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+@keyframes sink-blur {
+  from {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translate3d(0, -0.3em, 0);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(4%, -6%, 0) scale(1.08);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+@keyframes pulse-dot {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, #4ade80 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes border-spin {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .page-enter {
+    animation: rise 700ms var(--ease-out-expo) both;
+  }
+
+  .animate-rise {
+    animation: rise 1000ms var(--ease-out-expo) both;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  .animate-drift {
+    animation: drift 18s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: float 7s ease-in-out infinite;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  .animate-pulse-dot {
+    animation: pulse-dot 2.4s ease-out infinite;
+  }
+
+  .kinetic-in {
+    animation: rise-blur 800ms var(--ease-out-expo) both;
+    animation-delay: calc(var(--ci, 0) * 22ms);
+  }
+
+  .kinetic-out {
+    animation: sink-blur 420ms var(--ease-in-out-quint) both;
+    animation-delay: calc(var(--ci, 0) * 12ms);
+  }
+
+  .panel-enter {
+    animation: rise 600ms var(--ease-out-expo) both;
+  }
+}
+
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    transition:
+      opacity var(--duration-slow) var(--ease-out-expo),
+      transform var(--duration-slow) var(--ease-out-expo),
+      filter var(--duration-slow) var(--ease-out-expo),
+      clip-path 1.2s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  [data-reveal="fade"]:not([data-visible]) {
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-distance), 0);
+  }
+
+  [data-reveal="blur"]:not([data-visible]) {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translate3d(0, calc(var(--reveal-distance) * 0.6), 0);
+  }
+
+  [data-reveal="mask"]:not([data-visible]) {
+    clip-path: inset(12% 0 0 0 round var(--radius-frame));
+    opacity: 0;
+    transform: scale(1.02);
+  }
+
+  [data-reveal="words"] .word > span {
+    display: inline-block;
+    transition: transform 1s var(--ease-out-expo);
+    transition-delay: calc(var(--reveal-delay, 0ms) + var(--wi, 0) * 45ms);
+  }
+
+  [data-reveal="words"]:not([data-visible]) .word > span {
+    transform: translate3d(0, 108%, 0);
+  }
+
+  [data-reveal="line"] {
+    transform-origin: left center;
+  }
+
+  [data-reveal="line"]:not([data-visible]) {
+    transform: scaleX(0);
+  }
+}
+
+/* Words are clipped so they rise from behind a baseline mask. */
+.word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+/* ==========================================================================
+   Components that need selectors Tailwind cannot express cleanly
+   ========================================================================== */
+
+/* Animated conic border for highlighted interactive elements. */
+.border-glow {
+  position: relative;
+  isolation: isolate;
+}
+
+.border-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0deg,
+    var(--color-accent-blue) 60deg,
+    var(--color-accent-violet) 120deg,
+    transparent 180deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--duration-base) ease;
+}
+
+.border-glow:hover::before,
+.border-glow:focus-visible::before {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .border-glow:hover::before,
+  .border-glow:focus-visible::before {
+    animation: border-spin 3s linear infinite;
+  }
+}
+
+/* Mobile navigation dialog */
+dialog.mobile-nav {
+  max-width: none;
+  max-height: none;
+  width: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  inset: 0;
+}
+
+dialog.mobile-nav::backdrop {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.mobile-nav {
+    transition:
+      opacity 500ms var(--ease-out-expo),
+      clip-path 700ms var(--ease-out-expo),
+      display 700ms allow-discrete,
+      overlay 700ms allow-discrete;
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+
+  dialog.mobile-nav[open] {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+
+  @starting-style {
+    dialog.mobile-nav[open] {
+      opacity: 0;
+      clip-path: inset(0 0 100% 0);
+    }
+  }
+
+  dialog.mobile-nav[open] .mobile-nav-item {
+    animation: rise 800ms var(--ease-out-expo) both;
+    animation-delay: calc(150ms + var(--i, 0) * 55ms);
+  }
+}
+
+/* Native <details> disclosure marker reset */
+details > summary {
+  list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* ==========================================================================
+   Long-form reading (blog + insights)
+   ========================================================================== */
+
+.prose-article {
+  --prose-measure: 68ch;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: var(--fg);
+}
+
+@media (min-width: 768px) {
+  .prose-article {
+    font-size: 1.125rem;
+  }
+}
+
+.prose-article > * {
+  max-width: var(--prose-measure);
+}
+
+.prose-article > * + * {
+  margin-top: 1.4em;
+}
+
+.prose-article h2 {
+  margin-top: 2.6em;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+}
+
+.prose-article h3 {
+  margin-top: 2em;
+  font-size: 1.3rem;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+.prose-article h2 + *,
+.prose-article h3 + * {
+  margin-top: 0.8em;
+}
+
+.prose-article p,
+.prose-article li {
+  color: color-mix(in srgb, var(--fg) 86%, var(--surface));
+}
+
+.prose-article strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.prose-article a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-fg);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-thickness var(--duration-fast);
+}
+
+.prose-article a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.prose-article ul,
+.prose-article ol {
+  padding-left: 1.25em;
+}
+
+.prose-article ul {
+  list-style: disc;
+}
+
+.prose-article ol {
+  list-style: decimal;
+}
+
+.prose-article li + li {
+  margin-top: 0.5em;
+}
+
+.prose-article li::marker {
+  color: var(--fg-subtle);
+}
+
+.prose-article blockquote {
+  border-left: 2px solid var(--accent-fg);
+  padding-left: 1.25em;
+  font-size: 1.15em;
+  line-height: 1.6;
+  color: var(--fg);
+}
+
+.prose-article hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin-block: 3em;
+}
+
+.prose-article :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  padding: 0.15em 0.4em;
+  border-radius: 0.35em;
+  background: color-mix(in srgb, var(--fg) 7%, transparent);
+  border: 1px solid var(--line);
+}
+
+.prose-article figure[data-rehype-pretty-code-figure] {
+  max-width: min(100%, 80ch);
+}
+
+.prose-article pre {
+  overflow-x: auto;
+  border-radius: 1rem;
+  padding: 1.25rem 0;
+  background: var(--color-ink-950);
+  color: var(--color-chalk);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  border: 1px solid rgb(245 245 242 / 0.08);
+}
+
+.prose-article pre code {
+  display: grid;
+  min-width: 100%;
+}
+
+.prose-article pre [data-line] {
+  padding-inline: 1.25rem;
+}
+
+.prose-article pre [data-highlighted-line] {
+  background: rgb(91 124 255 / 0.12);
+  box-shadow: inset 2px 0 0 var(--color-accent-blue);
+}
+
+.prose-article table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.prose-article th,
+.prose-article td {
+  text-align: left;
+  padding: 0.65em 0.75em;
+  border-bottom: 1px solid var(--line);
+}
+
+.prose-article th {
+  font-weight: 600;
+  color: var(--fg);
+}
